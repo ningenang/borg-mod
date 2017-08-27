@@ -54,11 +54,12 @@ QVariant BotModel::data(const QModelIndex &index, int role) const
     case Runtime:
         return bot.runtime;
     case Path:
-        if (bot.path.length() > 20) {
-            return QStringLiteral("...") + bot.path.right(20);
-        } else {
-            return bot.path;
-        }
+        return bot.path;
+//        if (bot.path.length() > 20) {
+//            return QStringLiteral("...") + bot.path.right(20);
+//        } else {
+//            return bot.path;
+//        }
     case Arguments:
         return bot.arguments;
     case Wins:
@@ -203,7 +204,7 @@ void BotModel::launchBots()
         m_bots[i].process->setWorkingDirectory(file.path());
         QStringList arguments;
 
-        arguments << "--nice=19" << "--quiet" << "-c" << "--seccomp" << "--overlay-tmpfs" << ("--private=" + file.path());
+        arguments << "--quiet" << "-c" << "--seccomp" << "--overlay-tmpfs" << ("--private=" + file.path());
 
         if (m_bots[i].runtime.isEmpty()) {
 //            arguments << m_bots[i].path;
@@ -318,7 +319,7 @@ void BotModel::addBot(QString path)
     Bot bot;
     bot.enabled = true;
     bot.path = path;
-    bot.name = name;
+    bot.name = file.baseName().split("_")[1]; //entrypoint_teamname
     bot.wins = 0;
     bot.roundWins = 0;
     bot.totalScore = 0;
@@ -358,7 +359,7 @@ QHash<QString, QString> BotModel::runtimes()
     ret["python"] = "/usr/bin/python2";
     ret["python3"] = "/usr/bin/python";
     ret["ruby"] = "/usr/bin/ruby";
-    ret["nodejs"] = "/usr/bin/node";
+    ret["nodejs"] = "/usr/bin/nodejs";
     ret["perl"] = "/usr/bin/perl";
     ret["mono"] = "/usr/bin/mono";
     ret["java"] = "/usr/bin/java";

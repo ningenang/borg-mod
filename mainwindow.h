@@ -33,11 +33,14 @@ private slots:
 
     void addBot();
     void addBots();
+
     void removeBot();
 
     void kill();
     void serverFinished(int status);
 
+public slots:
+    void addBotsFromPath(QString folderPath);
     void resetBots();
 
 private:

@@ -24,10 +24,19 @@ int main(int argc, char *argv[])
         return TournamentController::instance();
     });
 
+    const QStringList args = QCoreApplication::arguments();
+
+    QString botDir = args.value(1);
+
     MainWindow w;
 
-
     w.show();
+
+    if (!botDir.isNull() && !botDir.isEmpty()){
+        w.resetBots();
+        w.addBotsFromPath(botDir);
+    }
+
 
     return a.exec();
 }

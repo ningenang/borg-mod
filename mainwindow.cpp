@@ -30,6 +30,7 @@
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QAction>
+#include <QDirIterator>
 
 #define SERVERPATH_KEY    "serverpath"
 #define ROUNDS_KEY        "rounds"
@@ -353,7 +354,7 @@ void MainWindow::launchServer()
     QFile::remove(m_serverProcess.workingDirectory() + "/scores.txt");
     m_serverProcess.start(serverExecutable.filePath(), arguments);
 
-    QTimer::singleShot(1000, m_botModel, SLOT(launchBots()));
+    QTimer::singleShot(5000, m_botModel, SLOT(launchBots()));
 }
 
 void MainWindow::readServerErr()
@@ -378,34 +379,47 @@ void MainWindow::addBot()
     m_botModel->addBot(path);
 }
 
-void MainWindow::addBots()
-{
-    QString dirPath = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-                QStringLiteral("/home/sandsmark/tg/17/ai"),
-                                                    QFileDialog::ShowDirsOnly
-                                                    | QFileDialog::DontResolveSymlinks);
+void MainWindow::addBotsFromPath(QString dirPath){
+    if (dirPath.isNull() || dirPath.isEmpty())
+    {
+        dirPath = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                    QStringLiteral("/home/sandsmark/tg/17/ai"),
+                                                        QFileDialog::ShowDirsOnly
+                                                        | QFileDialog::DontResolveSymlinks);
+    }
+
     if (dirPath.isEmpty()) {
         return;
     }
+
     qDebug() << "Checking for bots in" << dirPath;
-    QDir dir(dirPath);
-    for (const QString &subinfo : dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
-//    for (const QFileInfo &subinfo : dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot)) {
-//        qDebug() << subinfo.absolutePath();
-//        QDir subdir(subinfo.absoluteDir());
-        QDir subdir(dir.filePath(subinfo));
-        qDebug() << subdir;
-        QFileInfoList files = subdir.entryInfoList(QDir::Files | QDir::Executable);
-        if (!files.isEmpty()) {
-            m_botModel->addBot(files.first().absoluteFilePath());
-            continue;
+
+    QDir dir (dirPath);
+
+    QStringList nameFilter ("entrypoint_*");
+    QDirIterator dirIterator (dirPath, QDir::Dirs | QDir::NoDotAndDotDot);
+
+    while (dirIterator.hasNext())
+    {
+        QDir subdir (dirIterator.next());
+        QFileInfoList files = subdir.entryInfoList(nameFilter, QDir::Files);
+
+        QMutableListIterator<QFileInfo> fileIterator(files);
+        while  (fileIterator.hasNext()){
+            QFileInfo file = fileIterator.next();
+            if (file.baseName().startsWith("entrypoint_")){
+                qDebug() << "Found bot in " << file.dir();
+                m_botModel->addBot(file.absoluteFilePath());
+                break;
+            }
         }
-        files = subdir.entryInfoList(QDir::Files | QDir::Readable);
-        if (files.count() != 1) {
-            continue;
-        }
-        m_botModel->addBot(files.first().absoluteFilePath());
     }
+
+}
+
+void MainWindow::addBots()
+{
+    addBotsFromPath(QString::null);
 }
 
 void MainWindow::removeBot()
