@@ -192,6 +192,11 @@ void BotModel::removeRow(int row)
     save();
 }
 
+void BotModel::removeBots()
+{
+    m_bots.clear();
+}
+
 void BotModel::launchBots()
 {
     beginResetModel(); // For running info
@@ -247,6 +252,7 @@ void BotModel::killBots()
     }
     endResetModel();
 }
+
 
 void BotModel::handleProcessError(QProcess::ProcessError error)
 {

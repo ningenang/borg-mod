@@ -33,8 +33,9 @@ int main(int argc, char *argv[])
     w.show();
 
     if (!botDir.isNull() && !botDir.isEmpty()){
-        w.resetBots();
+        w.removeAllBots();
         w.addBotsFromPath(botDir);
+        w.resetTournamentNoPrompt();
     }
 
 

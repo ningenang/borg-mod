@@ -141,7 +141,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Reset tournament button
     QPushButton *resetTournamentButton = new QPushButton(tr("&Reset tournament"));
     addRemoveGroup->layout()->addWidget(resetTournamentButton);
-    connect(resetTournamentButton, &QAbstractButton::clicked, this, &MainWindow::resetBots);
+    connect(resetTournamentButton, &QAbstractButton::clicked, this, &MainWindow::resetTournament);
     addRemoveGroup->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
     // Add button
     QPushButton *addButton = new QPushButton(tr("&Add new bot..."));
@@ -394,15 +394,13 @@ void MainWindow::addBotsFromPath(QString dirPath){
 
     qDebug() << "Checking for bots in" << dirPath;
 
-    QDir dir (dirPath);
-
     QStringList nameFilter ("entrypoint_*");
-    QDirIterator dirIterator (dirPath, QDir::Dirs | QDir::NoDotAndDotDot);
+    QDirIterator dirIterator (dirPath, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
 
     while (dirIterator.hasNext())
     {
-        QDir subdir (dirIterator.next());
-        QFileInfoList files = subdir.entryInfoList(nameFilter, QDir::Files);
+        QDir dir (dirIterator.next());
+        QFileInfoList files = dir.entryInfoList(nameFilter, QDir::Files);
 
         QMutableListIterator<QFileInfo> fileIterator(files);
         while  (fileIterator.hasNext()){
@@ -434,6 +432,10 @@ void MainWindow::removeBot()
         return;
     }
     m_botModel->removeRow(row);
+}
+
+void MainWindow::removeAllBots(){
+    m_botModel->removeBots();
 }
 
 void MainWindow::kill()
@@ -504,11 +506,19 @@ void MainWindow::serverFinished(int status)
     saveSettings();
 }
 
-void MainWindow::resetBots()
-{
+void MainWindow::resetTournament(){
+
+
     if (QMessageBox::question(this, tr("Really reset?"), tr("Are you sure you want to reset everything?")) == QMessageBox::No) {
-        return;
+            return;
     }
+
+    resetTournamentNoPrompt();
+}
+
+void MainWindow::resetTournamentNoPrompt()
+{
+
     m_roundsPlayed = 0;
     saveSettings();
     m_botModel->resetBots();

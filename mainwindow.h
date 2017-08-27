@@ -36,12 +36,15 @@ private slots:
 
     void removeBot();
 
+
     void kill();
     void serverFinished(int status);
 
 public slots:
     void addBotsFromPath(QString folderPath);
-    void resetBots();
+    void removeAllBots();
+    void resetTournamentNoPrompt();
+    void resetTournament();
 
 private:
     void updateTopPlayers();
