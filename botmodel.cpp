@@ -210,7 +210,7 @@ void BotModel::launchBots()
         QStringList arguments;
 
         //arguments << "--quiet" << "-c" << "--seccomp" << "--overlay-tmpfs" << ("--private=" + file.path());
-        arguments << "--quiet" << "-c" << "--seccomp" << "--overlay-tmpfs";
+        arguments << "--quiet" << "-c" << "--seccomp" << "--overlay-tmpfs" << ("--output=" + file.path() + "/logfile.txt");
 
         if (m_bots[i].runtime.isEmpty()) {
 //            arguments << m_bots[i].path;
