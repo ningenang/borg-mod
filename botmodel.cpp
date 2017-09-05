@@ -209,7 +209,8 @@ void BotModel::launchBots()
         m_bots[i].process->setWorkingDirectory(file.path());
         QStringList arguments;
 
-        arguments << "--quiet" << "-c" << "--seccomp" << "--overlay-tmpfs" << ("--private=" + file.path());
+        //arguments << "--quiet" << "-c" << "--seccomp" << "--overlay-tmpfs" << ("--private=" + file.path());
+        arguments << "--quiet" << "-c" << "--seccomp" << "--overlay-tmpfs";
 
         if (m_bots[i].runtime.isEmpty()) {
 //            arguments << m_bots[i].path;
@@ -227,7 +228,7 @@ void BotModel::launchBots()
                 arguments << "-jar";
             }
 
-            arguments << file.fileName();
+            arguments << file.path() + "/" + file.fileName();
 
             if (!m_bots[i].arguments.isEmpty()) {
                 arguments << m_bots[i].arguments.split(' ');
@@ -331,7 +332,7 @@ void BotModel::addBot(QString path)
     bot.totalScore = 0;
     bot.roundsPlayed = 0;
     if (file.suffix() == "py") {
-        bot.runtime = "python";
+        bot.runtime = "python3";
     } else if (file.suffix() == "rb") {
         bot.runtime = "ruby";
     } else if (file.suffix() == "js") {
@@ -362,8 +363,8 @@ void BotModel::save()
 QHash<QString, QString> BotModel::runtimes()
 {
     QHash<QString, QString> ret;
-    ret["python"] = "/usr/bin/python2";
-    ret["python3"] = "/usr/bin/python";
+    ret["python"] = "/usr/bin/python";
+    ret["python3"] = "/usr/bin/python3";
     ret["ruby"] = "/usr/bin/ruby";
     ret["nodejs"] = "/usr/bin/nodejs";
     ret["perl"] = "/usr/bin/perl";
